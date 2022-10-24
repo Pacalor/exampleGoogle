@@ -20,22 +20,7 @@ import java.util.logging.Logger;
 public class GoogleExample {
 
     public static void main(String[] args) {
-        String url="https://www.google.com";
-
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://www.google.com"))
-                .build();
-
-        HttpResponse<String> response=null;
-        try {
-            response = client.send(request, BodyHandlers.ofString());
-        } catch (IOException ex) {
-            Logger.getLogger(GoogleExample.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(GoogleExample.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        System.out.println(response.body());
+        ChuckNorrisAPI cnapi= new ChuckNorrisAPI();
+        cnapi.CNGetRandom();
     }
 }
