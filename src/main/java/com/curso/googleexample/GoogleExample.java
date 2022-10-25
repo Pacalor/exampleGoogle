@@ -4,14 +4,6 @@
  */
 package com.curso.googleexample;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.net.http.HttpResponse.BodyHandlers;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -22,5 +14,10 @@ public class GoogleExample {
     public static void main(String[] args) {
         ChuckNorrisAPI cnapi= new ChuckNorrisAPI();
         cnapi.CNGetRandom();
+        
+        UI ui=new UI();
+        ui.menu();
+        
+
     }
 }
