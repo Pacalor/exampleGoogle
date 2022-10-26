@@ -10,6 +10,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -38,11 +39,16 @@ import kong.unirest.Unirest;
 public class AnonfilesAPI {
 
     private String url = "https://api.anonfiles.com/";
+    private VirusTotalAPI vtapi;
 
     public AnonfilesAPI() {
+        vtapi = new VirusTotalAPI();
     }
 
     public void uploadFile(String name) {
+
+        vtapi.scanFile(name);
+
         String uploadUrl = url + "upload";
         File file = new File(name);
 
@@ -116,28 +122,60 @@ public class AnonfilesAPI {
         try {
             response = client.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (IOException ex) {
-            Logger.getLogger(GoogleExample.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(AnonfilesAPI.class.getName()).log(Level.SEVERE, null, ex);
         } catch (InterruptedException ex) {
-            Logger.getLogger(GoogleExample.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(AnonfilesAPI.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         //json cast
         JsonObject album = new Gson().fromJson(response.body(), JsonObject.class);
         System.out.println("URL to download the file");
         String urldownload = album.getAsJsonObject("data").getAsJsonObject("file").getAsJsonObject("url").get("full").toString();
-        //Logger.getLogger(AnonfilesAPI.class.getName()).info(urldownload);
 
-        //URL download= new URL(urldownload);
-        //System.out.println(urldownload);
         urldownload = urldownload.replaceAll("\"", "");
 
+        System.out.println(URI.create(urldownload));
+
+        request = HttpRequest.newBuilder()
+                .uri(URI.create(urldownload))
+                .build();
         try {
-            
-            System.out.println(URI.create(urldownload).toURL());
-        } catch (MalformedURLException ex) {
+            response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (IOException ex) {
+            Logger.getLogger(AnonfilesAPI.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InterruptedException ex) {
             Logger.getLogger(AnonfilesAPI.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+        //String urlDownloadFile= response.body()
+        String[] html = response.body().split("\"");
+        String urlGood = "no text";
+
+        for (String string : html) {
+            if (string.contains(name)) {
+                urlGood = string;
+            }
+        }
+
+        Logger.getLogger(AnonfilesAPI.class.getName()).info(urlGood);
+
+        URL url = null;
+        try {
+            url = new URL(urlGood);
+            BufferedInputStream bis = new BufferedInputStream(url.openStream());
+            FileOutputStream fis = new FileOutputStream("example.txt");
+            byte[] buffer = new byte[1024];
+            int count = 0;
+            while ((count = bis.read(buffer, 0, 1024)) != -1) {
+                fis.write(buffer, 0, count);
+            }
+            fis.close();
+            bis.close();
+            
+        } catch (Exception ex) {
+            Logger.getLogger(AnonfilesAPI.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
     }
 
 }
