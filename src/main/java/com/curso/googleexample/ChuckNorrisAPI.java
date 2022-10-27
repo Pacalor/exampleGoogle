@@ -46,9 +46,6 @@ public class ChuckNorrisAPI {
         
         JsonObject album = new Gson().fromJson(response.body(), JsonObject.class);
         System.out.println(album.get("value"));
-    
-
-        
         
     }
     
